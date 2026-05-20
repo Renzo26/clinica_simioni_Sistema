@@ -14,10 +14,9 @@ export function useTheme() {
   const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
-    const stored = localStorage.getItem(KEY) as Theme | null;
-    const preferred = stored ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "dark");
-    setThemeState(preferred);
-    apply(preferred);
+    const stored = (localStorage.getItem(KEY) as Theme | null) ?? "light";
+    setThemeState(stored);
+    apply(stored);
   }, []);
 
   const setTheme = (t: Theme) => {

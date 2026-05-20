@@ -4,6 +4,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─────────────────────────────────────────────────────────────────────────
+   TOKENS DA MARCA — Clínica Simioni (extraídos do site real)
+   cream  = hsl(43  33%  94%)  fundo creme quente do site
+   teal   = hsl(174 48%  30%)  cor do botão "Agendar Consulta"
+   teal-d = hsl(185 65%  12%)  texto escuro do heading
+   gold   = hsl(36  65%  52%)  gold do logo "Clínica Simioni"
+   muted  = hsl(200 15%  50%)  texto secundário
+   ───────────────────────────────────────────────────────────────────────── */
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -45,123 +54,119 @@
   --font-display: "Space Grotesk", "Inter", sans-serif;
 }
 
-/* ─── Tema claro — Clínica Simioni ─────────────────────────────────────────
-   Primária: azul elétrico hsl(217 100% 60%) → oklch(0.58 0.21 258)
-   Sidebar: navy profundo (mesma identidade do dark, independente do tema)
-   ─────────────────────────────────────────────────────────────────────── */
+/* ─── LIGHT — creme + teal escuro (idêntico ao site institucional) ──────── */
 :root {
   --radius: 0.7rem;
 
-  /* Superfícies */
-  --background: oklch(0.975 0.008 242);
-  --foreground: oklch(0.14 0.06 258);
+  /* Fundo creme quente do site */
+  --background: hsl(43 33% 94%);
+  /* Texto: teal muito escuro */
+  --foreground: hsl(185 65% 12%);
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.14 0.06 258);
+  /* Cards brancos sobre o creme */
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(185 65% 12%);
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.14 0.06 258);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(185 65% 12%);
 
-  /* Azul elétrico da clínica */
-  --primary: oklch(0.52 0.21 258);
-  --primary-foreground: oklch(0.99 0 0);
-  --primary-glow: oklch(0.68 0.20 254);
+  /* Primary: teal escuro — exato do botão "Agendar Consulta" */
+  --primary: hsl(174 48% 30%);
+  --primary-foreground: hsl(0 0% 100%);
+  --primary-glow: hsl(174 48% 42%);
 
-  /* Secundária */
-  --secondary: oklch(0.93 0.016 244);
-  --secondary-foreground: oklch(0.24 0.10 258);
+  /* Secondary: teal bem claro */
+  --secondary: hsl(174 30% 90%);
+  --secondary-foreground: hsl(174 48% 22%);
 
-  /* Muted */
-  --muted: oklch(0.95 0.012 244);
-  --muted-foreground: oklch(0.50 0.05 252);
+  /* Muted: cinza creme */
+  --muted: hsl(43 20% 90%);
+  --muted-foreground: hsl(200 15% 48%);
 
-  /* Accent */
-  --accent: oklch(0.91 0.038 244);
-  --accent-foreground: oklch(0.22 0.12 258);
+  /* Accent: gold do logo */
+  --accent: hsl(36 65% 92%);
+  --accent-foreground: hsl(36 65% 30%);
 
   /* Semânticas */
-  --destructive: oklch(0.60 0.22 25);
-  --destructive-foreground: oklch(0.99 0 0);
+  --destructive: hsl(0 72% 48%);
+  --destructive-foreground: hsl(0 0% 98%);
 
-  --success: oklch(0.64 0.16 150);
-  --success-foreground: oklch(0.99 0 0);
+  --success: hsl(142 60% 40%);
+  --success-foreground: hsl(0 0% 98%);
 
-  --warning: oklch(0.76 0.15 75);
-  --warning-foreground: oklch(0.20 0.05 60);
+  --warning: hsl(38 85% 45%);
+  --warning-foreground: hsl(0 0% 98%);
 
-  /* Bordas e inputs */
-  --border: oklch(0.88 0.018 244);
-  --input: oklch(0.88 0.018 244);
-  --ring: oklch(0.52 0.21 258);
+  /* Bordas sutis */
+  --border: hsl(174 20% 82%);
+  --input: hsl(174 20% 82%);
+  --ring: hsl(174 48% 30% / 0.45);
 
-  /* Sidebar — navy da marca (igual ao dark, não muda com o tema) */
-  --sidebar: oklch(0.17 0.050 266);
-  --sidebar-foreground: oklch(0.93 0.010 248);
-  --sidebar-primary: oklch(0.63 0.20 254);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.23 0.055 266);
-  --sidebar-accent-foreground: oklch(0.97 0 0);
-  --sidebar-border: oklch(0.26 0.055 266);
-  --sidebar-ring: oklch(0.63 0.20 254);
+  /* Sidebar: teal escuríssimo — mesma cor em light e dark */
+  --sidebar: hsl(185 65% 8%);
+  --sidebar-foreground: hsl(43 30% 88%);
+  --sidebar-primary: hsl(174 55% 52%);
+  --sidebar-primary-foreground: hsl(185 65% 8%);
+  --sidebar-accent: hsl(185 55% 12%);
+  --sidebar-accent-foreground: hsl(43 30% 88%);
+  --sidebar-border: hsl(174 48% 30% / 0.20);
+  --sidebar-ring: hsl(174 55% 52% / 0.50);
 }
 
-/* ─── Tema escuro — Clínica Simioni ────────────────────────────────────────
-   Background: navy profundo hsl(224 70% 4%) → oklch(0.08 0.024 268)
-   Cards: navy glass hsl(224 64% 8%) → oklch(0.13 0.033 268)
-   Primária: azul elétrico vibrante para fundo escuro
-   ─────────────────────────────────────────────────────────────────────── */
+/* ─── DARK — teal profundo + creme invertido ────────────────────────────── */
 .dark {
-  /* Superfícies */
-  --background: oklch(0.08 0.024 268);
-  --foreground: oklch(0.92 0.012 242);
+  /* Fundo: teal muito escuro (derivado do teal-d do site) */
+  --background: hsl(185 55% 7%);
+  --foreground: hsl(43 30% 90%);
 
-  --card: oklch(0.13 0.033 268);
-  --card-foreground: oklch(0.92 0.012 242);
+  /* Cards: ligeiramente mais claro */
+  --card: hsl(185 50% 11%);
+  --card-foreground: hsl(43 30% 90%);
 
-  --popover: oklch(0.13 0.033 268);
-  --popover-foreground: oklch(0.92 0.012 242);
+  --popover: hsl(185 50% 10%);
+  --popover-foreground: hsl(43 30% 90%);
 
-  /* Azul elétrico — mais brilhante no dark para contrastar */
-  --primary: oklch(0.63 0.20 254);
-  --primary-foreground: oklch(0.08 0.024 268);
-  --primary-glow: oklch(0.74 0.18 250);
+  /* Primary: teal vibrante para fundo escuro */
+  --primary: hsl(174 55% 50%);
+  --primary-foreground: hsl(185 65% 8%);
+  --primary-glow: hsl(174 55% 62%);
 
-  /* Secundária */
-  --secondary: oklch(0.20 0.040 268);
-  --secondary-foreground: oklch(0.92 0.012 242);
+  /* Secondary */
+  --secondary: hsl(185 45% 16%);
+  --secondary-foreground: hsl(43 30% 88%);
 
   /* Muted */
-  --muted: oklch(0.18 0.035 268);
-  --muted-foreground: oklch(0.60 0.040 250);
+  --muted: hsl(185 40% 14%);
+  --muted-foreground: hsl(174 20% 55%);
 
-  /* Accent */
-  --accent: oklch(0.24 0.055 266);
-  --accent-foreground: oklch(0.92 0.012 242);
+  /* Accent: gold do logo, suave */
+  --accent: hsl(185 40% 18%);
+  --accent-foreground: hsl(43 30% 90%);
 
   /* Semânticas */
-  --destructive: oklch(0.65 0.20 25);
-  --destructive-foreground: oklch(0.99 0 0);
+  --destructive: hsl(0 65% 55%);
+  --destructive-foreground: hsl(0 0% 98%);
 
-  --success: oklch(0.68 0.16 150);
-  --success-foreground: oklch(0.08 0.020 268);
+  --success: hsl(142 60% 45%);
+  --success-foreground: hsl(185 65% 8%);
 
-  --warning: oklch(0.78 0.15 75);
-  --warning-foreground: oklch(0.10 0.020 268);
+  --warning: hsl(38 85% 55%);
+  --warning-foreground: hsl(185 65% 8%);
 
-  /* Bordas e inputs */
-  --border: oklch(0.22 0.040 268);
-  --input: oklch(0.22 0.040 268);
-  --ring: oklch(0.63 0.20 254);
+  /* Bordas */
+  --border: hsl(174 48% 30% / 0.20);
+  --input: hsl(174 48% 30% / 0.20);
+  --ring: hsl(174 55% 50% / 0.55);
 
-  /* Sidebar — ainda mais escuro que o background */
-  --sidebar: oklch(0.065 0.020 268);
-  --sidebar-foreground: oklch(0.92 0.010 248);
-  --sidebar-primary: oklch(0.63 0.20 254);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.16 0.038 268);
-  --sidebar-accent-foreground: oklch(0.94 0.008 248);
-  --sidebar-border: oklch(0.19 0.038 268);
-  --sidebar-ring: oklch(0.63 0.20 254);
+  /* Sidebar: idêntica nos dois temas */
+  --sidebar: hsl(185 65% 5%);
+  --sidebar-foreground: hsl(43 30% 88%);
+  --sidebar-primary: hsl(174 55% 52%);
+  --sidebar-primary-foreground: hsl(185 65% 8%);
+  --sidebar-accent: hsl(185 55% 12%);
+  --sidebar-accent-foreground: hsl(43 30% 88%);
+  --sidebar-border: hsl(174 48% 30% / 0.18);
+  --sidebar-ring: hsl(174 55% 52% / 0.50);
 }
 
 @layer base {
@@ -174,6 +179,18 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(174 48% 30% / 0.4);
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(174 55% 50% / 0.7); }
+
+  ::selection {
+    background: hsl(174 48% 30% / 0.25);
   }
 
   h1, h2, h3, h4 {

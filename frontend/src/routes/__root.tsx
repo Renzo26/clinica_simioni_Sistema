@@ -82,7 +82,7 @@ function RootComponent() {
         {/* Aplica o tema antes do primeiro paint para evitar flash */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem('clinica-simioni-theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}})()`,
+            __html: `(function(){var t=localStorage.getItem('clinica-simioni-theme');if(t==='dark'){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}})()`,
           }}
         />
       </head>
