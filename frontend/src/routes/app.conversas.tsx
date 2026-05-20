@@ -23,7 +23,7 @@ import {
 import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/app/conversas")({
-  head: () => ({ meta: [{ title: "Conversas — MecaFlow" }] }),
+  head: () => ({ meta: [{ title: "Conversas — Clínica Simioni" }] }),
   component: Conversas,
 });
 

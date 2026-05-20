@@ -16,239 +16,172 @@ depends_on = None
 
 
 def upgrade() -> None:
+    conn = op.get_bind()
+
+    # === enums (DO/EXCEPTION para suportar re-runs — CREATE TYPE não tem IF NOT EXISTS) ===
+    conn.execute(sa.text("""
+        DO $$ BEGIN
+            CREATE TYPE user_role AS ENUM ('ADMIN', 'SECRETARIA', 'PROFISSIONAL');
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$
+    """))
+    conn.execute(sa.text("""
+        DO $$ BEGIN
+            CREATE TYPE conversation_status AS ENUM ('BOT', 'HUMAN', 'UNASSIGNED', 'RESOLVED');
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$
+    """))
+    conn.execute(sa.text("""
+        DO $$ BEGIN
+            CREATE TYPE message_type AS ENUM ('TEXT', 'IMAGE', 'AUDIO', 'DOCUMENT');
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$
+    """))
+
     # === clinicas ===
-    op.create_table(
-        "clinicas",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("name", sa.String(200), nullable=False),
-        sa.Column("cnpj", sa.String(20), nullable=True, unique=True),
-        sa.Column("phone", sa.String(20), nullable=True),
-        sa.Column("email", sa.String(200), nullable=True),
-        sa.Column("address", sa.String(300), nullable=True),
-        sa.Column("city", sa.String(100), nullable=True),
-        sa.Column("state", sa.String(2), nullable=True),
-        sa.Column("cep", sa.String(10), nullable=True),
-        sa.Column("horario_atendimento", sa.String(300), nullable=True),
-        sa.Column("especialidades", sa.Text, nullable=True),
-        sa.Column("bot_info", sa.Text, nullable=True),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-            nullable=False,
-        ),
-    )
+    conn.execute(sa.text("""
+        CREATE TABLE IF NOT EXISTS clinicas (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name VARCHAR(200) NOT NULL,
+            cnpj VARCHAR(20) UNIQUE,
+            phone VARCHAR(20),
+            email VARCHAR(200),
+            address VARCHAR(300),
+            city VARCHAR(100),
+            state VARCHAR(2),
+            cep VARCHAR(10),
+            horario_atendimento VARCHAR(300),
+            especialidades TEXT,
+            bot_info TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """))
 
     # === users ===
-    user_role = postgresql.ENUM("ADMIN", "SECRETARIA", "PROFISSIONAL", name="user_role")
-    user_role.create(op.get_bind())
-
-    op.create_table(
-        "users",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column(
-            "clinica_id",
-            postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("clinicas.id"),
-            nullable=False,
-            index=True,
-        ),
-        sa.Column("name", sa.String(200), nullable=False),
-        sa.Column("email", sa.String(200), nullable=False, unique=True, index=True),
-        sa.Column("password_hash", sa.String(200), nullable=False),
-        sa.Column(
-            "role",
-            sa.Enum("ADMIN", "SECRETARIA", "PROFISSIONAL", name="user_role", create_type=False),
-            nullable=False,
-        ),
-        sa.Column("especialidade", sa.String(100), nullable=True),
-        sa.Column("is_active", sa.Boolean, nullable=False, server_default="true"),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-            nullable=False,
-        ),
-    )
+    conn.execute(sa.text("""
+        CREATE TABLE IF NOT EXISTS users (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            clinica_id UUID NOT NULL REFERENCES clinicas(id),
+            name VARCHAR(200) NOT NULL,
+            email VARCHAR(200) NOT NULL UNIQUE,
+            password_hash VARCHAR(200) NOT NULL,
+            role user_role NOT NULL DEFAULT 'ADMIN',
+            especialidade VARCHAR(100),
+            is_active BOOLEAN NOT NULL DEFAULT TRUE,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_users_clinica_id ON users(clinica_id)"))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_users_email ON users(email)"))
 
     # === pacientes ===
-    op.create_table(
-        "pacientes",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column(
-            "clinica_id",
-            postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("clinicas.id"),
-            nullable=False,
-            index=True,
-        ),
-        sa.Column("nome", sa.String(200), nullable=False),
-        sa.Column("telefone", sa.String(20), nullable=True),
-        sa.Column("email", sa.String(200), nullable=True),
-        sa.Column("data_nascimento", sa.String(10), nullable=True),
-        sa.Column("cpf", sa.String(14), nullable=True),
-        sa.Column("convenio", sa.String(100), nullable=True),
-        sa.Column("observacoes", sa.Text, nullable=True),
-        sa.Column("ultimo_atendimento", sa.String(10), nullable=True),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-            nullable=False,
-        ),
-    )
+    conn.execute(sa.text("""
+        CREATE TABLE IF NOT EXISTS pacientes (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            clinica_id UUID NOT NULL REFERENCES clinicas(id),
+            nome VARCHAR(200) NOT NULL,
+            telefone VARCHAR(20),
+            email VARCHAR(200),
+            data_nascimento VARCHAR(10),
+            cpf VARCHAR(14),
+            convenio VARCHAR(100),
+            observacoes TEXT,
+            ultimo_atendimento VARCHAR(10),
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_pacientes_clinica_id ON pacientes(clinica_id)"))
 
     # === consultas ===
-    op.create_table(
-        "consultas",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column(
-            "clinica_id",
-            postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("clinicas.id"),
-            nullable=False,
-            index=True,
-        ),
-        sa.Column("data", sa.String(10), nullable=False),
-        sa.Column("hora", sa.String(5), nullable=False),
-        sa.Column("titulo", sa.String(200), nullable=False),
-        sa.Column("paciente", sa.String(200), nullable=False),
-        sa.Column("telefone", sa.String(20), nullable=True),
-        sa.Column("especialidade", sa.String(100), nullable=True),
-        sa.Column("profissional", sa.String(200), nullable=True),
-        sa.Column("status", sa.String(20), nullable=False, server_default="AGENDADO"),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-            nullable=False,
-        ),
-    )
+    conn.execute(sa.text("""
+        CREATE TABLE IF NOT EXISTS consultas (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            clinica_id UUID NOT NULL REFERENCES clinicas(id),
+            data VARCHAR(10) NOT NULL,
+            hora VARCHAR(5) NOT NULL,
+            titulo VARCHAR(200) NOT NULL,
+            paciente VARCHAR(200) NOT NULL,
+            telefone VARCHAR(20),
+            especialidade VARCHAR(100),
+            profissional VARCHAR(200),
+            status VARCHAR(20) NOT NULL DEFAULT 'AGENDADO',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_consultas_clinica_id ON consultas(clinica_id)"))
 
     # === etiquetas ===
-    op.create_table(
-        "etiquetas",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column(
-            "clinica_id",
-            postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("clinicas.id"),
-            nullable=False,
-            index=True,
-        ),
-        sa.Column("nome", sa.String(100), nullable=False),
-        sa.Column("cor", sa.String(20), nullable=True),
-        sa.Column("descricao", sa.Text, nullable=True),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-            nullable=False,
-        ),
-    )
+    conn.execute(sa.text("""
+        CREATE TABLE IF NOT EXISTS etiquetas (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            clinica_id UUID NOT NULL REFERENCES clinicas(id),
+            nome VARCHAR(100) NOT NULL,
+            cor VARCHAR(20),
+            descricao TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_etiquetas_clinica_id ON etiquetas(clinica_id)"))
 
     # === conversations ===
-    conv_status = postgresql.ENUM(
-        "BOT", "HUMAN", "UNASSIGNED", "RESOLVED", name="conversation_status"
-    )
-    conv_status.create(op.get_bind())
-
-    op.create_table(
-        "conversations",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("waha_chat_id", sa.String(100), unique=True, nullable=False, index=True),
-        sa.Column("lead_name", sa.String(200), nullable=False),
-        sa.Column("lead_phone", sa.String(20), nullable=False),
-        sa.Column("session", sa.String(50), nullable=False, server_default="default"),
-        sa.Column(
-            "status",
-            sa.Enum("BOT", "HUMAN", "UNASSIGNED", "RESOLVED", name="conversation_status", create_type=False),
-            nullable=False,
-            server_default="UNASSIGNED",
-        ),
-        sa.Column("assigned_agent_id", sa.String(100), nullable=True),
-        sa.Column("assigned_agent_name", sa.String(200), nullable=True),
-        sa.Column("unread_count", sa.Integer, nullable=False, server_default="0"),
-        sa.Column("last_message", sa.Text, nullable=True),
-        sa.Column("last_message_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-            nullable=False,
-        ),
-        sa.Column(
-            "updated_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-            nullable=False,
-        ),
-    )
+    conn.execute(sa.text("""
+        CREATE TABLE IF NOT EXISTS conversations (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            waha_chat_id VARCHAR(100) NOT NULL UNIQUE,
+            lead_name VARCHAR(200) NOT NULL,
+            lead_phone VARCHAR(20) NOT NULL,
+            session VARCHAR(50) NOT NULL DEFAULT 'default',
+            status conversation_status NOT NULL DEFAULT 'UNASSIGNED',
+            assigned_agent_id VARCHAR(100),
+            assigned_agent_name VARCHAR(200),
+            unread_count INTEGER NOT NULL DEFAULT 0,
+            last_message TEXT,
+            last_message_at TIMESTAMPTZ,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_conversations_waha_chat_id ON conversations(waha_chat_id)"))
 
     # === messages ===
-    msg_type = postgresql.ENUM("TEXT", "IMAGE", "AUDIO", "DOCUMENT", name="message_type")
-    msg_type.create(op.get_bind())
-
-    op.create_table(
-        "messages",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column(
-            "conversation_id",
-            postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("conversations.id"),
-            nullable=False,
-            index=True,
-        ),
-        sa.Column("content", sa.Text, nullable=False),
-        sa.Column(
-            "type",
-            sa.Enum("TEXT", "IMAGE", "AUDIO", "DOCUMENT", name="message_type", create_type=False),
-            nullable=False,
-            server_default="TEXT",
-        ),
-        sa.Column("sender_name", sa.String(200), nullable=True),
-        sa.Column("is_from_lead", sa.Boolean, nullable=False, server_default="false"),
-        sa.Column("media_url", sa.Text, nullable=True),
-        sa.Column("waha_message_id", sa.String(200), nullable=True, unique=True),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-            nullable=False,
-        ),
-    )
+    conn.execute(sa.text("""
+        CREATE TABLE IF NOT EXISTS messages (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            conversation_id UUID NOT NULL REFERENCES conversations(id),
+            content TEXT NOT NULL,
+            type message_type NOT NULL DEFAULT 'TEXT',
+            sender_name VARCHAR(200),
+            is_from_lead BOOLEAN NOT NULL DEFAULT FALSE,
+            media_url TEXT,
+            waha_message_id VARCHAR(200) UNIQUE,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_messages_conversation_id ON messages(conversation_id)"))
 
     # === conversation_labels ===
-    op.create_table(
-        "conversation_labels",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column(
-            "conversation_id",
-            postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("conversations.id"),
-            nullable=False,
-            index=True,
-        ),
-        sa.Column("name", sa.String(100), nullable=False),
-        sa.Column("color", sa.String(20), nullable=True),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.func.now(),
-            nullable=False,
-        ),
-    )
+    conn.execute(sa.text("""
+        CREATE TABLE IF NOT EXISTS conversation_labels (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            conversation_id UUID NOT NULL REFERENCES conversations(id),
+            name VARCHAR(100) NOT NULL,
+            color VARCHAR(20),
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+    """))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_conv_labels_conv_id ON conversation_labels(conversation_id)"))
 
 
 def downgrade() -> None:
-    op.drop_table("conversation_labels")
-    op.drop_table("messages")
-    op.drop_table("conversations")
-    op.drop_table("etiquetas")
-    op.drop_table("consultas")
-    op.drop_table("pacientes")
-    op.drop_table("users")
-    op.drop_table("clinicas")
-    op.execute("DROP TYPE IF EXISTS message_type")
-    op.execute("DROP TYPE IF EXISTS conversation_status")
-    op.execute("DROP TYPE IF EXISTS user_role")
+    conn = op.get_bind()
+    conn.execute(sa.text("DROP TABLE IF EXISTS conversation_labels CASCADE"))
+    conn.execute(sa.text("DROP TABLE IF EXISTS messages CASCADE"))
+    conn.execute(sa.text("DROP TABLE IF EXISTS conversations CASCADE"))
+    conn.execute(sa.text("DROP TABLE IF EXISTS etiquetas CASCADE"))
+    conn.execute(sa.text("DROP TABLE IF EXISTS consultas CASCADE"))
+    conn.execute(sa.text("DROP TABLE IF EXISTS pacientes CASCADE"))
+    conn.execute(sa.text("DROP TABLE IF EXISTS users CASCADE"))
+    conn.execute(sa.text("DROP TABLE IF EXISTS clinicas CASCADE"))
+    conn.execute(sa.text("DROP TYPE IF EXISTS message_type"))
+    conn.execute(sa.text("DROP TYPE IF EXISTS conversation_status"))
+    conn.execute(sa.text("DROP TYPE IF EXISTS user_role"))

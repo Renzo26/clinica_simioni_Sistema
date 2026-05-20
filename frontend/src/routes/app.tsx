@@ -19,15 +19,15 @@ export const Route = createFileRoute("/app")({
 function AppLayout() {
   const navigate = useNavigate();
   const session = getSession();
-  const [workshopName, setWorkshopName] = useState(session?.workshop.name ?? "MecaFlow");
+  const [clinicaName, setClinicaName] = useState(session?.clinica.name ?? "Clínica Simioni");
 
   useEffect(() => {
     const handler = () => {
       const s = getSession();
-      if (s) setWorkshopName(s.workshop.name);
+      if (s) setClinicaName(s.clinica.name);
     };
-    window.addEventListener("workshop-name-updated", handler);
-    return () => window.removeEventListener("workshop-name-updated", handler);
+    window.addEventListener("clinica-name-updated", handler);
+    return () => window.removeEventListener("clinica-name-updated", handler);
   }, []);
 
   const handleLogout = () => {
@@ -45,7 +45,7 @@ function AppLayout() {
             <div className="flex items-center gap-2">
               <SidebarTrigger />
               <span className="text-sm text-muted-foreground">
-                {workshopName}
+                {clinicaName}
               </span>
             </div>
             <div className="flex items-center gap-2">

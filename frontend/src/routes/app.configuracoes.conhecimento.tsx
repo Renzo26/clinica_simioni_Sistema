@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/app/configuracoes/conhecimento")({
-  head: () => ({ meta: [{ title: "Minha oficina — MecaFlow" }] }),
+  head: () => ({ meta: [{ title: "Minha clínica — Clínica Simioni" }] }),
   component: Conhecimento,
 });
 
@@ -23,15 +23,15 @@ type Settings = {
   city: string | null;
   state: string | null;
   cep: string | null;
-  business_hours: string | null;
-  services: string | null;
+  horario_atendimento: string | null;
+  especialidades: string | null;
   bot_info: string | null;
 };
 
 const empty: Settings = {
   name: "", cnpj: "", phone: "", email: "",
   address: "", city: "", state: "", cep: "",
-  business_hours: "", services: "", bot_info: "",
+  horario_atendimento: "", especialidades: "", bot_info: "",
 };
 
 function Conhecimento() {
@@ -40,9 +40,9 @@ function Conhecimento() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    api.get<Settings>("/workshop")
+    api.get<Settings>("/clinica")
       .then((d) => setData({ ...empty, ...d }))
-      .catch(() => toast.error("Erro ao carregar dados da oficina"))
+      .catch(() => toast.error("Erro ao carregar dados da clínica"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -54,19 +54,18 @@ function Conhecimento() {
     e.preventDefault();
     setSaving(true);
     try {
-      const updated = await api.put<Settings>("/workshop", data);
+      const updated = await api.put<Settings>("/clinica", data);
       setData({ ...empty, ...updated });
-      // Sincroniza o nome no localStorage para o header refletir imediatamente
-      const raw = localStorage.getItem("auth_workshop");
+      const raw = localStorage.getItem("auth_clinica");
       if (raw) {
-        const w = JSON.parse(raw) as { id: string; name: string };
-        w.name = updated.name;
-        localStorage.setItem("auth_workshop", JSON.stringify(w));
-        window.dispatchEvent(new Event("workshop-name-updated"));
+        const c = JSON.parse(raw) as { id: string; name: string };
+        c.name = updated.name;
+        localStorage.setItem("auth_clinica", JSON.stringify(c));
+        window.dispatchEvent(new Event("clinica-name-updated"));
       }
       toast.success("Configurações salvas com sucesso");
     } catch {
-      toast.error("Erro ao salvar configurações");
+      toast.error("Erro ao salvar configurações da clínica");
     } finally {
       setSaving(false);
     }
@@ -83,8 +82,8 @@ function Conhecimento() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold">Minha oficina</h1>
-        <p className="text-sm text-muted-foreground">Informações da oficina usadas pelo bot e pela equipe.</p>
+        <h1 className="font-display text-2xl font-bold">Minha clínica</h1>
+        <p className="text-sm text-muted-foreground">Informações da clínica usadas pelo bot e pela equipe.</p>
       </div>
 
       <form onSubmit={salvar} className="grid gap-4 lg:grid-cols-2">
@@ -92,8 +91,8 @@ function Conhecimento() {
           <CardHeader><CardTitle className="text-base">Identificação</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
-              <Label>Nome da oficina</Label>
-              <Input required value={data.name} onChange={set("name")} placeholder="Auto Center Silva" />
+              <Label>Nome da clínica</Label>
+              <Input required value={data.name} onChange={set("name")} placeholder="Clínica Simioni" />
             </div>
             <div className="space-y-2">
               <Label>CNPJ</Label>
@@ -105,7 +104,7 @@ function Conhecimento() {
             </div>
             <div className="space-y-2">
               <Label>E-mail</Label>
-              <Input type="email" value={data.email ?? ""} onChange={set("email")} placeholder="contato@oficina.com" />
+              <Input type="email" value={data.email ?? ""} onChange={set("email")} placeholder="contato@clinicasimioni.com.br" />
             </div>
           </CardContent>
         </Card>
@@ -135,15 +134,15 @@ function Conhecimento() {
         </Card>
 
         <Card className="lg:col-span-2">
-          <CardHeader><CardTitle className="text-base">Funcionamento e serviços</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">Funcionamento e especialidades</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
               <Label>Horário de funcionamento</Label>
-              <Input value={data.business_hours ?? ""} onChange={set("business_hours")} placeholder="Seg–Sex 08h–18h, Sáb 08h–12h" />
+              <Input value={data.horario_atendimento ?? ""} onChange={set("horario_atendimento")} placeholder="Seg–Sex 08h–18h, Sáb 08h–12h" />
             </div>
             <div className="space-y-2">
-              <Label>Serviços oferecidos</Label>
-              <Textarea rows={4} value={data.services ?? ""} onChange={set("services")} placeholder="Troca de óleo, alinhamento, balanceamento, revisão completa, freios, suspensão." />
+              <Label>Especialidades</Label>
+              <Textarea rows={4} value={data.especialidades ?? ""} onChange={set("especialidades")} placeholder="Neuropsicologia, Psicologia, Fonoaudiologia, Terapia Ocupacional..." />
             </div>
             <div className="space-y-2">
               <Label>Informações adicionais para o bot</Label>

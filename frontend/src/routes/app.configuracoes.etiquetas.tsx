@@ -11,7 +11,7 @@ import {
 import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/app/configuracoes/etiquetas")({
-  head: () => ({ meta: [{ title: "Etiquetas — MecaFlow" }] }),
+  head: () => ({ meta: [{ title: "Etiquetas — Clínica Simioni" }] }),
   component: Etiquetas,
 });
 

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Plus, Trash2, Loader2, Car, Phone, Pencil } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Trash2, Loader2, Phone, Pencil, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/app/agenda")({
-  head: () => ({ meta: [{ title: "Agenda — MecaFlow" }] }),
+  head: () => ({ meta: [{ title: "Agenda — Clínica Simioni" }] }),
   component: Agenda,
 });
 
@@ -19,8 +19,8 @@ type Evento = {
   data: string;
   hora: string;
   titulo: string;
-  cliente: string;
-  veiculo: string | null;
+  paciente: string;
+  especialidade: string | null;
   telefone: string | null;
 };
 
@@ -47,7 +47,7 @@ function Agenda() {
   const [toEdit, setToEdit] = useState<Evento | null>(null);
 
   useEffect(() => {
-    api.get<Evento[]>("/appointments")
+    api.get<Evento[]>("/consultas")
       .then(setEventos)
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -71,12 +71,12 @@ function Agenda() {
     const f = new FormData(e.currentTarget);
     setSaving(true);
     try {
-      const novo = await api.post<Evento>("/appointments", {
+      const novo = await api.post<Evento>("/consultas", {
         data: String(f.get("data")),
         hora: String(f.get("hora")),
         titulo: String(f.get("titulo")),
-        cliente: String(f.get("cliente")),
-        veiculo: String(f.get("veiculo") || "") || null,
+        paciente: String(f.get("paciente")),
+        especialidade: String(f.get("especialidade") || "") || null,
         telefone: String(f.get("telefone") || "") || null,
       });
       setEventos((arr) => [...arr, novo]);
@@ -99,12 +99,12 @@ function Agenda() {
       data: toEdit.data,
       hora: toEdit.hora,
       titulo: toEdit.titulo,
-      cliente: toEdit.cliente,
-      veiculo: String(f.get("veiculo") || "") || null,
+      paciente: toEdit.paciente,
+      especialidade: String(f.get("especialidade") || "") || null,
       telefone: String(f.get("telefone") || "") || null,
     };
     try {
-      const updated = await api.put<Evento>(`/appointments/${toEdit.id}`, body);
+      const updated = await api.put<Evento>(`/consultas/${toEdit.id}`, body);
       setEventos((arr) => arr.map((e) => (e.id === toEdit.id ? updated : e)));
       setOpenEdit(false);
       setToEdit(null);
@@ -120,7 +120,7 @@ function Agenda() {
     if (!toDelete) return;
     setDeleting(true);
     try {
-      await api.delete(`/appointments/${toDelete.id}`);
+      await api.delete(`/consultas/${toDelete.id}`);
       setEventos((arr) => arr.filter((e) => e.id !== toDelete.id));
       setOpenConfirm(false);
       setToDelete(null);
@@ -134,9 +134,9 @@ function Agenda() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold">Agenda</h1>
-          <p className="text-sm text-muted-foreground">Visualize e gerencie agendamentos.</p>
+          <p className="text-sm text-muted-foreground">Visualize e gerencie consultas agendadas.</p>
         </div>
-        <Button onClick={() => setOpen(true)}><Plus className="mr-1 h-4 w-4" /> Novo agendamento</Button>
+        <Button onClick={() => setOpen(true)}><Plus className="mr-1 h-4 w-4" /> Nova consulta</Button>
       </div>
 
       {loading ? (
@@ -196,7 +196,7 @@ function Agenda() {
               {new Date(diaSel + "T00:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}
             </h3>
             <div className="mt-4 space-y-2">
-              {evDia(diaSel).length === 0 && <p className="text-sm text-muted-foreground">Sem agendamentos.</p>}
+              {evDia(diaSel).length === 0 && <p className="text-sm text-muted-foreground">Sem consultas agendadas.</p>}
               {evDia(diaSel).map((e) => (
                 <div key={e.id} className="flex gap-3 rounded-lg border p-3">
                   <div className="flex h-12 w-14 flex-col items-center justify-center rounded-md bg-primary/10 text-primary">
@@ -204,11 +204,11 @@ function Agenda() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{e.titulo}</p>
-                    <p className="text-sm text-muted-foreground">{e.cliente}</p>
-                    {e.veiculo && (
+                    <p className="text-sm text-muted-foreground">{e.paciente}</p>
+                    {e.especialidade && (
                       <p className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                        <Car className="h-3 w-3 shrink-0" />
-                        {e.veiculo}
+                        <Stethoscope className="h-3 w-3 shrink-0" />
+                        {e.especialidade}
                       </p>
                     )}
                     {e.telefone && (
@@ -242,15 +242,15 @@ function Agenda() {
         </div>
       )}
 
-      {/* Dialog: Novo agendamento */}
+      {/* Dialog: Nova consulta */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Novo agendamento</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Nova consulta</DialogTitle></DialogHeader>
           <form onSubmit={criar} className="space-y-3">
-            <div className="space-y-2"><Label>Cliente</Label><Input name="cliente" required /></div>
-            <div className="space-y-2"><Label>Serviço</Label><Input name="titulo" required /></div>
+            <div className="space-y-2"><Label>Paciente</Label><Input name="paciente" required /></div>
+            <div className="space-y-2"><Label>Tipo de consulta / procedimento</Label><Input name="titulo" required placeholder="Ex: Avaliação, Retorno, Sessão..." /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2"><Label>Veículo</Label><Input name="veiculo" placeholder="Ex: Onix, Fiesta..." /></div>
+              <div className="space-y-2"><Label>Especialidade</Label><Input name="especialidade" placeholder="Ex: Psicologia..." /></div>
               <div className="space-y-2"><Label>Telefone</Label><Input name="telefone" placeholder="11999999999" /></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -266,14 +266,14 @@ function Agenda() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog: Editar agendamento */}
+      {/* Dialog: Editar consulta */}
       <Dialog open={openEdit} onOpenChange={(v) => { setOpenEdit(v); if (!v) setToEdit(null); }}>
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Editar agendamento</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Editar consulta</DialogTitle></DialogHeader>
           <form onSubmit={salvarEdit} className="space-y-3">
             <div className="space-y-2">
-              <Label>Veículo</Label>
-              <Input name="veiculo" placeholder="Ex: Onix 2014, Fiesta..." defaultValue={toEdit?.veiculo ?? ""} />
+              <Label>Especialidade</Label>
+              <Input name="especialidade" placeholder="Ex: Psicologia, Fonoaudiologia..." defaultValue={toEdit?.especialidade ?? ""} />
             </div>
             <div className="space-y-2">
               <Label>Telefone (WhatsApp)</Label>
@@ -291,12 +291,12 @@ function Agenda() {
       <Dialog open={openConfirm} onOpenChange={(v) => { setOpenConfirm(v); if (!v) setToDelete(null); }}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Cancelar agendamento?</DialogTitle>
+            <DialogTitle>Cancelar consulta?</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Você está prestes a cancelar o agendamento de{" "}
-              <span className="font-medium text-foreground">{toDelete?.cliente}</span> às{" "}
+              Você está prestes a cancelar a consulta de{" "}
+              <span className="font-medium text-foreground">{toDelete?.paciente}</span> às{" "}
               <span className="font-medium text-foreground">{toDelete?.hora}</span>.
             </p>
             {toDelete?.telefone ? (
@@ -304,12 +304,12 @@ function Agenda() {
                 <p className="font-medium text-green-800 dark:text-green-300">Mensagem automática no WhatsApp</p>
                 <p className="mt-0.5 text-green-700 dark:text-green-400">
                   Uma mensagem de cancelamento será enviada para{" "}
-                  <span className="font-medium">{toDelete.telefone}</span> informando o cliente.
+                  <span className="font-medium">{toDelete.telefone}</span> informando o paciente.
                 </p>
               </div>
             ) : (
               <p className="text-xs text-amber-600 dark:text-amber-400">
-                Nenhum telefone cadastrado — o cliente não será notificado automaticamente.
+                Nenhum telefone cadastrado — o paciente não será notificado automaticamente.
               </p>
             )}
           </div>

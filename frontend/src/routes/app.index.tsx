@@ -7,7 +7,7 @@ import { api } from "@/lib/api";
 import { getSession } from "@/lib/auth";
 
 export const Route = createFileRoute("/app/")({
-  head: () => ({ meta: [{ title: "Dashboard — MecaFlow" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Clínica Simioni" }] }),
   component: Dashboard,
 });
 
@@ -20,7 +20,7 @@ type Conv = {
   labels: { id: string; name: string; color: string | null }[];
 };
 
-type Agendamento = { id: string; data: string; hora: string; titulo: string; cliente: string };
+type Agendamento = { id: string; data: string; hora: string; titulo: string; paciente: string };
 
 function fmtHoje() {
   const d = new Date();
@@ -51,7 +51,7 @@ function Dashboard() {
     Promise.all([
       api.get<Conv[]>("/conversations?tab=ALL"),
       api.get<Conv[]>("/conversations?tab=RESOLVED"),
-      api.get<Agendamento[]>(`/appointments?data=${hoje}`),
+      api.get<Agendamento[]>(`/consultas?data=${hoje}`),
     ]).then(([todas, resolved, ags]) => {
       setConversas(todas.slice(0, 3));
       const abertasCount = todas.filter((c) => c.status !== "RESOLVED").length;
@@ -75,7 +75,7 @@ function Dashboard() {
         <h1 className="font-display text-2xl font-bold">
           Olá, {session?.user.name.split(" ")[0]} 👋
         </h1>
-        <p className="text-sm text-muted-foreground">Visão geral da operação da oficina hoje.</p>
+        <p className="text-sm text-muted-foreground">Visão geral da operação da clínica hoje.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -151,7 +151,7 @@ function Dashboard() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-medium">{a.titulo}</p>
-                    <p className="truncate text-sm text-muted-foreground">{a.cliente}</p>
+                    <p className="truncate text-sm text-muted-foreground">{a.paciente}</p>
                   </div>
                 </div>
               ))

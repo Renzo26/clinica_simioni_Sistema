@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Wrench, Check } from "lucide-react";
+import { Stethoscope, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,11 +8,11 @@ import { api } from "@/lib/api";
 import { setAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/cadastro")({
-  head: () => ({ meta: [{ title: "Cadastrar oficina — MecaFlow" }] }),
+  head: () => ({ meta: [{ title: "Cadastrar clínica — Clínica Simioni" }] }),
   component: CadastroPage,
 });
 
-const steps = ["Oficina", "Conta"];
+const steps = ["Clínica", "Conta"];
 
 function CadastroPage() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ function CadastroPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [workshopName, setWorkshopName] = useState("");
+  const [clinicaName, setClinicaName] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,9 +38,9 @@ function CadastroPage() {
       const data = await api.post<{
         access_token: string;
         refresh_token: string;
-        user: { id: string; name: string; email: string; role: string; workshop_id: string };
-        workshop: { id: string; name: string };
-      }>("/auth/register", { workshop_name: workshopName, name, email, password });
+        user: { id: string; name: string; email: string; role: string; clinica_id: string };
+        clinica: { id: string; name: string };
+      }>("/auth/register", { clinica_name: clinicaName, name, email, password });
       setAuth(data);
       navigate({ to: "/app" });
     } catch (err) {
@@ -55,9 +55,9 @@ function CadastroPage() {
       <div className="mx-auto max-w-2xl">
         <Link to="/login" className="inline-flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Wrench className="h-5 w-5" />
+            <Stethoscope className="h-5 w-5" />
           </div>
-          <span className="font-display text-lg font-bold">MecaFlow</span>
+          <span className="font-display text-lg font-bold">Clínica Simioni</span>
         </Link>
 
         <div className="mt-6 rounded-2xl border bg-card p-6 shadow-sm md:p-8">
@@ -80,15 +80,15 @@ function CadastroPage() {
           <form onSubmit={next} className="mt-8 space-y-4">
             {step === 0 && (
               <>
-                <h1 className="font-display text-xl font-bold">Conte sobre sua oficina</h1>
+                <h1 className="font-display text-xl font-bold">Conte sobre sua clínica</h1>
                 <div className="space-y-2">
-                  <Label htmlFor="nome">Nome da oficina</Label>
+                  <Label htmlFor="nome">Nome da clínica</Label>
                   <Input
                     id="nome"
                     required
-                    placeholder="Auto Center Silva"
-                    value={workshopName}
-                    onChange={(e) => setWorkshopName(e.target.value)}
+                    placeholder="Clínica Simioni"
+                    value={clinicaName}
+                    onChange={(e) => setClinicaName(e.target.value)}
                   />
                 </div>
               </>
@@ -113,7 +113,7 @@ function CadastroPage() {
                     id="ema"
                     type="email"
                     required
-                    placeholder="voce@oficina.com"
+                    placeholder="voce@clinicasimioni.com.br"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />

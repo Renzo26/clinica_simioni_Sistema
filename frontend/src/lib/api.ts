@@ -42,7 +42,7 @@ function clearAuth() {
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
   localStorage.removeItem("auth_user");
-  localStorage.removeItem("auth_workshop");
+  localStorage.removeItem("auth_clinica");
 }
 
 export const api = {

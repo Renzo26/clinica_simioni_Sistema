@@ -3,17 +3,17 @@ export interface AuthUser {
   name: string;
   email: string;
   role: string;
-  workshop_id: string;
+  clinica_id: string;
 }
 
-export interface AuthWorkshop {
+export interface AuthClinica {
   id: string;
   name: string;
 }
 
 export interface AuthSession {
   user: AuthUser;
-  workshop: AuthWorkshop;
+  clinica: AuthClinica;
   access_token: string;
 }
 
@@ -21,32 +21,32 @@ export function setAuth(data: {
   access_token: string;
   refresh_token: string;
   user: AuthUser;
-  workshop: AuthWorkshop;
+  clinica: AuthClinica;
 }) {
   localStorage.setItem("access_token", data.access_token);
   localStorage.setItem("refresh_token", data.refresh_token);
   localStorage.setItem("auth_user", JSON.stringify(data.user));
-  localStorage.setItem("auth_workshop", JSON.stringify(data.workshop));
+  localStorage.setItem("auth_clinica", JSON.stringify(data.clinica));
 }
 
 export function clearAuth() {
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
   localStorage.removeItem("auth_user");
-  localStorage.removeItem("auth_workshop");
+  localStorage.removeItem("auth_clinica");
 }
 
 export function getSession(): AuthSession | null {
   if (typeof window === "undefined") return null;
   const token = localStorage.getItem("access_token");
   const userRaw = localStorage.getItem("auth_user");
-  const workshopRaw = localStorage.getItem("auth_workshop");
-  if (!token || !userRaw || !workshopRaw) return null;
+  const clinicaRaw = localStorage.getItem("auth_clinica");
+  if (!token || !userRaw || !clinicaRaw) return null;
   try {
     return {
       access_token: token,
       user: JSON.parse(userRaw) as AuthUser,
-      workshop: JSON.parse(workshopRaw) as AuthWorkshop,
+      clinica: JSON.parse(clinicaRaw) as AuthClinica,
     };
   } catch {
     return null;

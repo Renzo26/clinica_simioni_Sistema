@@ -3,7 +3,7 @@ import {
   LayoutDashboard,
   MessagesSquare,
   CalendarDays,
-  Wrench,
+  Stethoscope,
   Users,
   BookOpen,
   Tag,
@@ -23,6 +23,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { clearAuth } from "@/lib/auth";
+import { useNavigate } from "@tanstack/react-router";
 
 const main = [
   { title: "Dashboard", url: "/app", icon: LayoutDashboard, exact: true },
@@ -33,26 +35,32 @@ const main = [
 
 const config = [
   { title: "Usuários", url: "/app/configuracoes/usuarios", icon: Users },
-  { title: "Minha oficina", url: "/app/configuracoes/conhecimento", icon: BookOpen },
-  { title: "Clientes", url: "/app/configuracoes/clientes", icon: UserCircle },
+  { title: "Minha clínica", url: "/app/configuracoes/conhecimento", icon: BookOpen },
+  { title: "Pacientes", url: "/app/configuracoes/clientes", icon: UserCircle },
   { title: "Etiquetas", url: "/app/configuracoes/etiquetas", icon: Tag },
 ];
 
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
   const isActive = (url: string, exact?: boolean) =>
     exact ? path === url : path === url || path.startsWith(url + "/");
+
+  const handleLogout = () => {
+    clearAuth();
+    navigate({ to: "/login" });
+  };
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-1.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-            <Wrench className="h-5 w-5" />
+            <Stethoscope className="h-5 w-5" />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="font-display text-base font-bold leading-tight">MecaFlow</span>
-            <span className="text-xs text-sidebar-foreground/60">Gestão de oficina</span>
+            <span className="font-display text-base font-bold leading-tight">Clínica Simioni</span>
+            <span className="text-xs text-sidebar-foreground/60">Gestão clínica</span>
           </div>
         </div>
       </SidebarHeader>
@@ -98,11 +106,9 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Sair">
-              <Link to="/login">
-                <LogOut />
-                <span>Sair</span>
-              </Link>
+            <SidebarMenuButton onClick={handleLogout} tooltip="Sair">
+              <LogOut />
+              <span>Sair</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

@@ -13,15 +13,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/app/configuracoes/usuarios")({
-  head: () => ({ meta: [{ title: "Usuários — MecaFlow" }] }),
+  head: () => ({ meta: [{ title: "Usuários — Clínica Simioni" }] }),
   component: UsuariosPage,
 });
 
-type Usuario = { id: string; name: string; email: string; role: "ADMIN" | "AGENT" };
-type RoleValue = "ADMIN" | "AGENT";
+type Usuario = { id: string; name: string; email: string; role: "ADMIN" | "SECRETARIA" | "PROFISSIONAL" };
+type RoleValue = "ADMIN" | "SECRETARIA" | "PROFISSIONAL";
 
 function roleLabel(role: RoleValue) {
-  return role === "ADMIN" ? "Admin" : "Atendente";
+  if (role === "ADMIN") return "Admin";
+  if (role === "SECRETARIA") return "Secretaria";
+  return "Profissional";
 }
 
 function UsuariosPage() {
@@ -30,8 +32,8 @@ function UsuariosPage() {
   const [saving, setSaving] = useState(false);
   const [novoOpen, setNovoOpen] = useState(false);
   const [editUser, setEditUser] = useState<Usuario | null>(null);
-  const [novoRole, setNovoRole] = useState<RoleValue>("AGENT");
-  const [editRole, setEditRole] = useState<RoleValue>("AGENT");
+  const [novoRole, setNovoRole] = useState<RoleValue>("SECRETARIA");
+  const [editRole, setEditRole] = useState<RoleValue>("SECRETARIA");
 
   useEffect(() => {
     api.get<Usuario[]>("/users")
@@ -53,7 +55,7 @@ function UsuariosPage() {
       });
       setUsers((arr) => [...arr, created]);
       setNovoOpen(false);
-      setNovoRole("AGENT");
+      setNovoRole("SECRETARIA");
     } catch { /* ignora */ } finally {
       setSaving(false);
     }
@@ -91,9 +93,9 @@ function UsuariosPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold">Usuários</h1>
-          <p className="text-sm text-muted-foreground">Gerencie a equipe da oficina.</p>
+          <p className="text-sm text-muted-foreground">Gerencie a equipe da clínica.</p>
         </div>
-        <Button onClick={() => { setNovoOpen(true); setNovoRole("AGENT"); }}>
+        <Button onClick={() => { setNovoOpen(true); setNovoRole("SECRETARIA" as RoleValue); }}>
           <Plus className="mr-1 h-4 w-4" /> Novo usuário
         </Button>
       </div>
@@ -124,7 +126,7 @@ function UsuariosPage() {
                   <TableCell className="font-medium">{u.name}</TableCell>
                   <TableCell className="text-muted-foreground">{u.email}</TableCell>
                   <TableCell>
-                    <Badge className={u.role === "ADMIN" ? "bg-primary/15 text-primary border-0" : "bg-muted text-muted-foreground border-0"}>
+                    <Badge className={u.role === "ADMIN" ? "bg-primary/15 text-primary border-0" : u.role === "PROFISSIONAL" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-0" : "bg-muted text-muted-foreground border-0"}>
                       {roleLabel(u.role)}
                     </Badge>
                   </TableCell>
@@ -157,7 +159,8 @@ function UsuariosPage() {
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ADMIN">Admin</SelectItem>
-                  <SelectItem value="AGENT">Atendente</SelectItem>
+                  <SelectItem value="SECRETARIA">Secretaria</SelectItem>
+                  <SelectItem value="PROFISSIONAL">Profissional</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -190,7 +193,7 @@ function UsuariosPage() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ADMIN">Admin</SelectItem>
-                    <SelectItem value="AGENT">Atendente</SelectItem>
+                    <SelectItem value="SECRETARIA">Atendente</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -6,19 +6,19 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/app/assistente")({
-  head: () => ({ meta: [{ title: "Meu Assistente — MecaFlow" }] }),
+  head: () => ({ meta: [{ title: "Meu Assistente — Clínica Simioni" }] }),
   component: Assistente,
 });
 
 type Papel = "assistant" | "user";
 type Msg = { id: string; papel: Papel; texto: string; hora: string };
 
-const STORAGE_KEY = "mecaflow_assistant_history";
+const STORAGE_KEY = "clinica_simioni_assistant_history";
 
 const BOA_VINDA: Msg = {
   id: "boas-vindas",
   papel: "assistant",
-  texto: "Olá! Sou o assistente da MecaFlow 👋 Tenho acesso aos dados da sua oficina em tempo real. Pode me perguntar sobre clientes, agendamentos, serviços mais realizados, conversas abertas e muito mais!",
+  texto: "Olá! Sou o assistente da Clínica Simioni. Tenho acesso aos dados da clínica em tempo real. Pode me perguntar sobre pacientes, agendamentos, especialidades, conversas abertas e muito mais!",
   hora: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
 };
 

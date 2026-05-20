@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 from app.api import auth, conversations, webhooks, sse, assistant
-from app.api import pacientes, consultas, etiquetas, clinica_users
+from app.api import pacientes, consultas, etiquetas, clinica_users, clinica_settings
 
 settings = get_settings()
 
@@ -19,7 +19,8 @@ async def lifespan(app: FastAPI):
     redis = await get_redis()
     app.state.redis = redis
     yield
-    await redis.aclose()
+    if redis:
+        await redis.aclose()
 
 
 app = FastAPI(
@@ -45,6 +46,7 @@ app.include_router(pacientes.router, prefix="/api")
 app.include_router(consultas.router, prefix="/api")
 app.include_router(etiquetas.router, prefix="/api")
 app.include_router(clinica_users.router, prefix="/api")
+app.include_router(clinica_settings.router, prefix="/api")
 app.include_router(assistant.router, prefix="/api")
 
 

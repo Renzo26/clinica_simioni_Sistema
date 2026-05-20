@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 export type Theme = "light" | "dark";
 
-const KEY = "mecaflow-theme";
+const KEY = "clinica-simioni-theme";
 
 function apply(theme: Theme) {
   const root = document.documentElement;

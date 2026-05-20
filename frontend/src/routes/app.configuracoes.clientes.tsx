@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, Search, Car, Phone, Calendar, FileText, User, Loader2, Wrench, Hash } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Phone, Calendar, FileText, User, Loader2, Mail, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,40 +13,40 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/app/configuracoes/clientes")({
-  head: () => ({ meta: [{ title: "Clientes — MecaFlow" }] }),
+  head: () => ({ meta: [{ title: "Pacientes — Clínica Simioni" }] }),
   component: Clientes,
 });
 
-type Cliente = {
+type Paciente = {
   id: string;
   nome: string;
   telefone: string | null;
-  veiculo: string | null;
-  ano_veiculo: string | null;
-  placa: string | null;
+  email: string | null;
+  data_nascimento: string | null;
+  cpf: string | null;
+  convenio: string | null;
+  observacoes: string | null;
   ultimo_atendimento: string | null;
-  servico_realizado: string | null;
-  resumo: string | null;
 };
 
 function Clientes() {
-  const [list, setList] = useState<Cliente[]>([]);
+  const [list, setList] = useState<Paciente[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [busca, setBusca] = useState("");
   const [open, setOpen] = useState(false);
-  const [edit, setEdit] = useState<Cliente | null>(null);
-  const [perfil, setPerfil] = useState<Cliente | null>(null);
+  const [edit, setEdit] = useState<Paciente | null>(null);
+  const [perfil, setPerfil] = useState<Paciente | null>(null);
 
   useEffect(() => {
-    api.get<Cliente[]>("/clients")
+    api.get<Paciente[]>("/pacientes")
       .then(setList)
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   const filtered = list.filter((c) =>
-    [c.nome, c.telefone, c.placa, c.veiculo]
+    [c.nome, c.telefone, c.cpf, c.email, c.convenio]
       .some((v) => v?.toLowerCase().includes(busca.toLowerCase()))
   );
 
@@ -55,21 +55,21 @@ function Clientes() {
     const f = new FormData(e.currentTarget);
     const body = {
       nome: String(f.get("nome")),
-      telefone: String(f.get("telefone") || ""),
-      veiculo: String(f.get("veiculo") || ""),
-      ano_veiculo: String(f.get("ano_veiculo") || ""),
-      placa: String(f.get("placa") || ""),
+      telefone: String(f.get("telefone") || "") || null,
+      email: String(f.get("email") || "") || null,
+      data_nascimento: String(f.get("data_nascimento") || "") || null,
+      cpf: String(f.get("cpf") || "") || null,
+      convenio: String(f.get("convenio") || "") || null,
       ultimo_atendimento: String(f.get("ultimo_atendimento") || "") || null,
-      servico_realizado: String(f.get("servico_realizado") || ""),
-      resumo: String(f.get("resumo") || ""),
+      observacoes: String(f.get("observacoes") || "") || null,
     };
     setSaving(true);
     try {
       if (edit) {
-        const updated = await api.put<Cliente>(`/clients/${edit.id}`, body);
+        const updated = await api.put<Paciente>(`/pacientes/${edit.id}`, body);
         setList((arr) => arr.map((c) => (c.id === edit.id ? updated : c)));
       } else {
-        const created = await api.post<Cliente>("/clients", body);
+        const created = await api.post<Paciente>("/pacientes", body);
         setList((arr) => [...arr, created]);
       }
       setOpen(false);
@@ -80,26 +80,26 @@ function Clientes() {
   };
 
   const deletar = async (id: string) => {
-    await api.delete(`/clients/${id}`).catch(() => {});
+    await api.delete(`/pacientes/${id}`).catch(() => {});
     setList((arr) => arr.filter((c) => c.id !== id));
   };
 
   const abrirNovo = () => { setEdit(null); setOpen(true); };
-  const abrirEdit = (c: Cliente) => { setEdit(c); setOpen(true); };
+  const abrirEdit = (c: Paciente) => { setEdit(c); setOpen(true); };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold">Clientes</h1>
-          <p className="text-sm text-muted-foreground">Histórico de clientes e veículos.</p>
+          <h1 className="font-display text-2xl font-bold">Pacientes</h1>
+          <p className="text-sm text-muted-foreground">Cadastro de pacientes da clínica.</p>
         </div>
-        <Button onClick={abrirNovo}><Plus className="mr-1 h-4 w-4" /> Novo cliente</Button>
+        <Button onClick={abrirNovo}><Plus className="mr-1 h-4 w-4" /> Novo paciente</Button>
       </div>
 
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome, placa..." className="pl-9" />
+        <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome, CPF, convênio..." className="pl-9" />
       </div>
 
       <div className="rounded-xl border bg-card">
@@ -109,10 +109,10 @@ function Clientes() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Cliente</TableHead>
+                <TableHead>Paciente</TableHead>
                 <TableHead>Telefone</TableHead>
-                <TableHead>Veículo / Ano</TableHead>
-                <TableHead>Placa</TableHead>
+                <TableHead>CPF</TableHead>
+                <TableHead>Convênio</TableHead>
                 <TableHead>Último atendimento</TableHead>
                 <TableHead />
               </TableRow>
@@ -121,7 +121,7 @@ function Clientes() {
               {filtered.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} className="py-10 text-center text-sm text-muted-foreground">
-                    Nenhum cliente cadastrado.
+                    Nenhum paciente cadastrado.
                   </TableCell>
                 </TableRow>
               )}
@@ -130,17 +130,12 @@ function Clientes() {
                   <TableCell>
                     <button type="button" onClick={() => setPerfil(c)} className="group text-left">
                       <p className="cursor-pointer font-medium text-primary underline-offset-2 group-hover:underline">{c.nome}</p>
-                      <p className="line-clamp-1 text-xs text-muted-foreground">
-                        {c.servico_realizado ?? c.resumo ?? "—"}
-                      </p>
+                      <p className="line-clamp-1 text-xs text-muted-foreground">{c.email ?? "—"}</p>
                     </button>
                   </TableCell>
                   <TableCell>{c.telefone ?? "—"}</TableCell>
-                  <TableCell>
-                    {c.veiculo ?? "—"}
-                    {c.ano_veiculo ? <span className="ml-1 text-xs text-muted-foreground">({c.ano_veiculo})</span> : null}
-                  </TableCell>
-                  <TableCell>{c.placa ?? "—"}</TableCell>
+                  <TableCell>{c.cpf ?? "—"}</TableCell>
+                  <TableCell>{c.convenio ?? "—"}</TableCell>
                   <TableCell>{c.ultimo_atendimento ?? "—"}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => abrirEdit(c)}><Pencil className="h-4 w-4" /></Button>
@@ -156,23 +151,20 @@ function Clientes() {
       {/* Dialog: Criar / Editar */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{edit ? "Editar cliente" : "Novo cliente"}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{edit ? "Editar paciente" : "Novo paciente"}</DialogTitle></DialogHeader>
           <form onSubmit={salvar} className="space-y-3">
-            <div className="space-y-2"><Label>Nome</Label><Input name="nome" required defaultValue={edit?.nome} /></div>
+            <div className="space-y-2"><Label>Nome completo</Label><Input name="nome" required defaultValue={edit?.nome} /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2"><Label>Telefone</Label><Input name="telefone" defaultValue={edit?.telefone ?? ""} /></div>
-              <div className="space-y-2"><Label>Placa</Label><Input name="placa" defaultValue={edit?.placa ?? ""} /></div>
+              <div className="space-y-2"><Label>Telefone</Label><Input name="telefone" placeholder="(11) 99999-0000" defaultValue={edit?.telefone ?? ""} /></div>
+              <div className="space-y-2"><Label>CPF</Label><Input name="cpf" placeholder="000.000.000-00" defaultValue={edit?.cpf ?? ""} /></div>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="col-span-2 space-y-2"><Label>Veículo</Label><Input name="veiculo" placeholder="Ex: Onix, Fiesta..." defaultValue={edit?.veiculo ?? ""} /></div>
-              <div className="space-y-2"><Label>Ano</Label><Input name="ano_veiculo" placeholder="2024" maxLength={4} defaultValue={edit?.ano_veiculo ?? ""} /></div>
+            <div className="space-y-2"><Label>E-mail</Label><Input name="email" type="email" placeholder="paciente@email.com" defaultValue={edit?.email ?? ""} /></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2"><Label>Data de nascimento</Label><Input name="data_nascimento" type="date" defaultValue={edit?.data_nascimento ?? ""} /></div>
+              <div className="space-y-2"><Label>Convênio</Label><Input name="convenio" placeholder="Unimed, Amil..." defaultValue={edit?.convenio ?? ""} /></div>
             </div>
             <div className="space-y-2"><Label>Último atendimento</Label><Input name="ultimo_atendimento" type="date" defaultValue={edit?.ultimo_atendimento ?? ""} /></div>
-            <div className="space-y-2">
-              <Label>Serviço realizado</Label>
-              <Input name="servico_realizado" placeholder="Ex: Troca de óleo, alinhamento..." defaultValue={edit?.servico_realizado ?? ""} />
-            </div>
-            <div className="space-y-2"><Label>Observações</Label><Textarea name="resumo" placeholder="Informações adicionais sobre o cliente ou atendimento..." defaultValue={edit?.resumo ?? ""} /></div>
+            <div className="space-y-2"><Label>Observações</Label><Textarea name="observacoes" placeholder="Informações adicionais sobre o paciente..." defaultValue={edit?.observacoes ?? ""} /></div>
             <DialogFooter>
               <Button type="submit" disabled={saving}>
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar"}
@@ -190,7 +182,7 @@ function Clientes() {
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
                 <User className="h-5 w-5 text-primary" />
               </div>
-              Perfil do cliente
+              Perfil do paciente
             </DialogTitle>
           </DialogHeader>
           {perfil && (
@@ -200,17 +192,12 @@ function Clientes() {
               <div className="grid gap-3">
                 {[
                   { Icon: Phone, label: "Telefone", value: perfil.telefone },
-                  {
-                    Icon: Car,
-                    label: "Veículo",
-                    value: perfil.veiculo
-                      ? `${perfil.veiculo}${perfil.ano_veiculo ? ` (${perfil.ano_veiculo})` : ""}`
-                      : null,
-                  },
-                  { Icon: Hash, label: "Placa", value: perfil.placa },
+                  { Icon: Mail, label: "E-mail", value: perfil.email },
+                  { Icon: Hash, label: "CPF", value: perfil.cpf },
+                  { Icon: Calendar, label: "Data de nascimento", value: perfil.data_nascimento },
+                  { Icon: FileText, label: "Convênio", value: perfil.convenio },
                   { Icon: Calendar, label: "Último atendimento", value: perfil.ultimo_atendimento },
-                  { Icon: Wrench, label: "Serviço realizado", value: perfil.servico_realizado },
-                  { Icon: FileText, label: "Observações", value: perfil.resumo },
+                  { Icon: FileText, label: "Observações", value: perfil.observacoes },
                 ].map(({ Icon, label, value }) => (
                   <div key={label} className="flex items-start gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
                     <Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
