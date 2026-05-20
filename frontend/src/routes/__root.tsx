@@ -79,6 +79,12 @@ function RootComponent() {
     <html lang="pt-BR">
       <head>
         <HeadContent />
+        {/* Aplica o tema antes do primeiro paint para evitar flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem('clinica-simioni-theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}})()`,
+          }}
+        />
       </head>
       <body>
         <QueryClientProvider client={queryClient}>

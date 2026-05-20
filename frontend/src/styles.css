@@ -45,96 +45,123 @@
   --font-display: "Space Grotesk", "Inter", sans-serif;
 }
 
+/* ─── Tema claro — Clínica Simioni ─────────────────────────────────────────
+   Primária: azul elétrico hsl(217 100% 60%) → oklch(0.58 0.21 258)
+   Sidebar: navy profundo (mesma identidade do dark, independente do tema)
+   ─────────────────────────────────────────────────────────────────────── */
 :root {
   --radius: 0.7rem;
 
-  --background: oklch(0.985 0.005 240);
-  --foreground: oklch(0.18 0.05 250);
+  /* Superfícies */
+  --background: oklch(0.975 0.008 242);
+  --foreground: oklch(0.14 0.06 258);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.05 250);
+  --card-foreground: oklch(0.14 0.06 258);
+
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.05 250);
+  --popover-foreground: oklch(0.14 0.06 258);
 
-  --primary: oklch(0.32 0.12 255);
+  /* Azul elétrico da clínica */
+  --primary: oklch(0.52 0.21 258);
   --primary-foreground: oklch(0.99 0 0);
-  --primary-glow: oklch(0.55 0.18 255);
+  --primary-glow: oklch(0.68 0.20 254);
 
-  --secondary: oklch(0.95 0.015 250);
-  --secondary-foreground: oklch(0.25 0.08 255);
+  /* Secundária */
+  --secondary: oklch(0.93 0.016 244);
+  --secondary-foreground: oklch(0.24 0.10 258);
 
-  --muted: oklch(0.96 0.01 250);
-  --muted-foreground: oklch(0.5 0.03 255);
+  /* Muted */
+  --muted: oklch(0.95 0.012 244);
+  --muted-foreground: oklch(0.50 0.05 252);
 
-  --accent: oklch(0.92 0.04 250);
-  --accent-foreground: oklch(0.25 0.1 255);
+  /* Accent */
+  --accent: oklch(0.91 0.038 244);
+  --accent-foreground: oklch(0.22 0.12 258);
 
-  --destructive: oklch(0.6 0.22 25);
+  /* Semânticas */
+  --destructive: oklch(0.60 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --success: oklch(0.65 0.16 150);
+  --success: oklch(0.64 0.16 150);
   --success-foreground: oklch(0.99 0 0);
 
-  --warning: oklch(0.78 0.15 75);
-  --warning-foreground: oklch(0.2 0.05 60);
+  --warning: oklch(0.76 0.15 75);
+  --warning-foreground: oklch(0.20 0.05 60);
 
-  --border: oklch(0.91 0.015 250);
-  --input: oklch(0.91 0.015 250);
-  --ring: oklch(0.45 0.15 255);
+  /* Bordas e inputs */
+  --border: oklch(0.88 0.018 244);
+  --input: oklch(0.88 0.018 244);
+  --ring: oklch(0.52 0.21 258);
 
-  --sidebar: oklch(0.22 0.06 255);
-  --sidebar-foreground: oklch(0.95 0.01 250);
-  --sidebar-primary: oklch(0.6 0.18 250);
+  /* Sidebar — navy da marca (igual ao dark, não muda com o tema) */
+  --sidebar: oklch(0.17 0.050 266);
+  --sidebar-foreground: oklch(0.93 0.010 248);
+  --sidebar-primary: oklch(0.63 0.20 254);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.28 0.07 255);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.3 0.06 255);
-  --sidebar-ring: oklch(0.6 0.15 250);
+  --sidebar-accent: oklch(0.23 0.055 266);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(0.26 0.055 266);
+  --sidebar-ring: oklch(0.63 0.20 254);
 }
 
+/* ─── Tema escuro — Clínica Simioni ────────────────────────────────────────
+   Background: navy profundo hsl(224 70% 4%) → oklch(0.08 0.024 268)
+   Cards: navy glass hsl(224 64% 8%) → oklch(0.13 0.033 268)
+   Primária: azul elétrico vibrante para fundo escuro
+   ─────────────────────────────────────────────────────────────────────── */
 .dark {
-  --background: oklch(0.16 0.025 255);
-  --foreground: oklch(0.96 0.01 240);
+  /* Superfícies */
+  --background: oklch(0.08 0.024 268);
+  --foreground: oklch(0.92 0.012 242);
 
-  --card: oklch(0.2 0.03 255);
-  --card-foreground: oklch(0.96 0.01 240);
-  --popover: oklch(0.2 0.03 255);
-  --popover-foreground: oklch(0.96 0.01 240);
+  --card: oklch(0.13 0.033 268);
+  --card-foreground: oklch(0.92 0.012 242);
 
-  --primary: oklch(0.65 0.17 250);
-  --primary-foreground: oklch(0.12 0.02 255);
-  --primary-glow: oklch(0.75 0.16 245);
+  --popover: oklch(0.13 0.033 268);
+  --popover-foreground: oklch(0.92 0.012 242);
 
-  --secondary: oklch(0.25 0.035 255);
-  --secondary-foreground: oklch(0.96 0.01 240);
+  /* Azul elétrico — mais brilhante no dark para contrastar */
+  --primary: oklch(0.63 0.20 254);
+  --primary-foreground: oklch(0.08 0.024 268);
+  --primary-glow: oklch(0.74 0.18 250);
 
-  --muted: oklch(0.23 0.03 255);
-  --muted-foreground: oklch(0.7 0.02 250);
+  /* Secundária */
+  --secondary: oklch(0.20 0.040 268);
+  --secondary-foreground: oklch(0.92 0.012 242);
 
-  --accent: oklch(0.3 0.06 250);
-  --accent-foreground: oklch(0.96 0.01 240);
+  /* Muted */
+  --muted: oklch(0.18 0.035 268);
+  --muted-foreground: oklch(0.60 0.040 250);
 
-  --destructive: oklch(0.65 0.2 25);
+  /* Accent */
+  --accent: oklch(0.24 0.055 266);
+  --accent-foreground: oklch(0.92 0.012 242);
+
+  /* Semânticas */
+  --destructive: oklch(0.65 0.20 25);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --success: oklch(0.7 0.16 150);
-  --success-foreground: oklch(0.12 0.02 255);
+  --success: oklch(0.68 0.16 150);
+  --success-foreground: oklch(0.08 0.020 268);
 
   --warning: oklch(0.78 0.15 75);
-  --warning-foreground: oklch(0.12 0.02 255);
+  --warning-foreground: oklch(0.10 0.020 268);
 
-  --border: oklch(0.28 0.04 255);
-  --input: oklch(0.28 0.04 255);
-  --ring: oklch(0.6 0.15 250);
+  /* Bordas e inputs */
+  --border: oklch(0.22 0.040 268);
+  --input: oklch(0.22 0.040 268);
+  --ring: oklch(0.63 0.20 254);
 
-  --sidebar: oklch(0.13 0.02 255);
-  --sidebar-foreground: oklch(0.94 0.01 250);
-  --sidebar-primary: oklch(0.65 0.17 250);
+  /* Sidebar — ainda mais escuro que o background */
+  --sidebar: oklch(0.065 0.020 268);
+  --sidebar-foreground: oklch(0.92 0.010 248);
+  --sidebar-primary: oklch(0.63 0.20 254);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.22 0.04 255);
-  --sidebar-accent-foreground: oklch(0.96 0.01 240);
-  --sidebar-border: oklch(0.24 0.04 255);
-  --sidebar-ring: oklch(0.6 0.15 250);
+  --sidebar-accent: oklch(0.16 0.038 268);
+  --sidebar-accent-foreground: oklch(0.94 0.008 248);
+  --sidebar-border: oklch(0.19 0.038 268);
+  --sidebar-ring: oklch(0.63 0.20 254);
 }
 
 @layer base {
