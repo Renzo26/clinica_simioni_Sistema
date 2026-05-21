@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Plus, Pencil, Trash2, Search, Phone, Calendar, FileText,
-  User, Loader2, Mail, Hash, ClipboardList, ChevronRight, Clock,
+  User, Loader2, Mail, Hash, ClipboardList, ChevronRight, Clock, Lightbulb,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -177,9 +177,15 @@ function Clientes() {
         <Button onClick={abrirNovo}><Plus className="mr-1 h-4 w-4" /> Novo paciente</Button>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome, CPF, convênio..." className="pl-9" />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="relative max-w-sm flex-1 min-w-[240px]">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar por nome, CPF, convênio..." className="pl-9" />
+        </div>
+        <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs text-muted-foreground">
+          <Lightbulb className="h-3.5 w-3.5 text-primary" />
+          <span>Clique no nome do paciente para abrir o perfil e lançar atendimentos.</span>
+        </div>
       </div>
 
       <div className="rounded-xl border bg-card">
