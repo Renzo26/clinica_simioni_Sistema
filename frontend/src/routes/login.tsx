@@ -1,6 +1,5 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,22 +43,23 @@ function LoginPage() {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="hidden bg-sidebar text-sidebar-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-            <Stethoscope className="h-5 w-5" />
-          </div>
-          <span className="font-display text-xl font-bold">Clínica Simioni</span>
-        </div>
-        <div>
-          <h2 className="font-display text-3xl font-bold leading-tight">
+      <div
+        className="hidden text-sidebar-foreground lg:flex lg:flex-col lg:justify-center lg:gap-10 lg:p-16"
+        style={{
+          background:
+            "linear-gradient(170deg, hsl(43 33% 91%) 0%, hsl(43 33% 85%) 30%, hsl(185 65% 12%) 65%, hsl(185 65% 8%) 100%)",
+        }}
+      >
+        <img src="/logo.png" alt="Clínica Simioni" className="w-full max-w-full self-center" />
+        <div className="w-full">
+          <h2 className="font-display text-4xl font-bold leading-tight drop-shadow-sm">
             Cuidando de pacientes com tecnologia e dedicação desde 1983.
           </h2>
-          <p className="mt-3 text-sidebar-foreground/70">
+          <p className="mt-4 text-base text-sidebar-foreground/70">
             Conversas, agenda, pacientes e equipe em um só lugar.
           </p>
         </div>
-        <p className="text-xs text-sidebar-foreground/50">© Clínica Simioni</p>
+        <p className="text-xs text-sidebar-foreground/40">© Clínica Simioni</p>
       </div>
 
       <div className="flex items-center justify-center px-6 py-12">

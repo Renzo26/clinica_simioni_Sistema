@@ -28,7 +28,7 @@ function Etiquetas() {
   const [cor, setCor] = useState(CORES[0]);
 
   useEffect(() => {
-    api.get<Etiqueta[]>("/labels")
+    api.get<Etiqueta[]>("/etiquetas")
       .then(setList)
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -48,10 +48,10 @@ function Etiquetas() {
     setSaving(true);
     try {
       if (edit) {
-        const updated = await api.put<Etiqueta>(`/labels/${edit.id}`, body);
+        const updated = await api.put<Etiqueta>(`/etiquetas/${edit.id}`, body);
         setList((arr) => arr.map((x) => (x.id === edit.id ? updated : x)));
       } else {
-        const created = await api.post<Etiqueta>("/labels", body);
+        const created = await api.post<Etiqueta>("/etiquetas", body);
         setList((arr) => [...arr, created]);
       }
       setOpen(false);
@@ -62,7 +62,7 @@ function Etiquetas() {
   };
 
   const deletar = async (id: string) => {
-    await api.delete(`/labels/${id}`).catch(() => {});
+    await api.delete(`/etiquetas/${id}`).catch(() => {});
     setList((arr) => arr.filter((x) => x.id !== id));
   };
 
