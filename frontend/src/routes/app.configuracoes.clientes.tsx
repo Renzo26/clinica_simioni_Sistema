@@ -167,7 +167,12 @@ function Clientes() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold">Pacientes</h1>
-          <p className="text-sm text-muted-foreground">Cadastro de pacientes da clínica.</p>
+          <p className="text-sm text-muted-foreground">
+            Cadastro de pacientes da clínica.{" "}
+            <span className="text-foreground/70">
+              Clique no nome para ver o perfil e o histórico de atendimentos.
+            </span>
+          </p>
         </div>
         <Button onClick={abrirNovo}><Plus className="mr-1 h-4 w-4" /> Novo paciente</Button>
       </div>
@@ -204,7 +209,10 @@ function Clientes() {
                 <TableRow key={c.id}>
                   <TableCell>
                     <button type="button" onClick={() => abrirPerfil(c)} className="group text-left">
-                      <p className="cursor-pointer font-medium text-primary underline-offset-2 group-hover:underline">{c.nome}</p>
+                      <p className="inline-flex items-center gap-1 cursor-pointer font-medium text-primary underline-offset-2 group-hover:underline">
+                        {c.nome}
+                        <ChevronRight className="h-3.5 w-3.5 opacity-40 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
+                      </p>
                       <p className="line-clamp-1 text-xs text-muted-foreground">{c.email ?? "—"}</p>
                     </button>
                   </TableCell>
