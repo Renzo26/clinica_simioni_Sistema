@@ -13,4 +13,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8080"]
+CMD ["sh", "-c", "echo '=== DATABASE_URL ===' && echo $DATABASE_URL && alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8080"]
