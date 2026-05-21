@@ -1,15 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, Search, Phone, Calendar, FileText, User, Loader2, Mail, Hash } from "lucide-react";
+import {
+  Plus, Pencil, Trash2, Search, Phone, Calendar, FileText,
+  User, Loader2, Mail, Hash, ClipboardList, ChevronRight, Clock,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/app/configuracoes/clientes")({
@@ -29,14 +34,42 @@ type Paciente = {
   ultimo_atendimento: string | null;
 };
 
+type Atendimento = {
+  id: string;
+  paciente_id: string;
+  data: string;
+  hora: string | null;
+  tipo: string;
+  profissional: string | null;
+  observacoes: string | null;
+  created_at: string;
+};
+
+const TIPOS_ATENDIMENTO = ["Consulta", "Retorno", "Avaliação", "Sessão", "Exame", "Outro"];
+
+function formatDate(d: string | null) {
+  if (!d) return "—";
+  const [y, m, day] = d.split("-");
+  return `${day}/${m}/${y}`;
+}
+
 function Clientes() {
   const [list, setList] = useState<Paciente[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [busca, setBusca] = useState("");
+
+  // Modais
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState<Paciente | null>(null);
   const [perfil, setPerfil] = useState<Paciente | null>(null);
+
+  // Atendimentos
+  const [atendimentos, setAtendimentos] = useState<Atendimento[]>([]);
+  const [loadingAtend, setLoadingAtend] = useState(false);
+  const [novoAtend, setNovoAtend] = useState(false);
+  const [savingAtend, setSavingAtend] = useState(false);
+  const [tipoAtend, setTipoAtend] = useState("Consulta");
 
   useEffect(() => {
     api.get<Paciente[]>("/pacientes")
@@ -45,12 +78,25 @@ function Clientes() {
       .finally(() => setLoading(false));
   }, []);
 
+  const abrirPerfil = async (p: Paciente) => {
+    setPerfil(p);
+    setAtendimentos([]);
+    setNovoAtend(false);
+    setLoadingAtend(true);
+    try {
+      const data = await api.get<Atendimento[]>(`/pacientes/${p.id}/atendimentos`);
+      setAtendimentos(data);
+    } catch { /* ignora */ } finally {
+      setLoadingAtend(false);
+    }
+  };
+
   const filtered = list.filter((c) =>
     [c.nome, c.telefone, c.cpf, c.email, c.convenio]
       .some((v) => v?.toLowerCase().includes(busca.toLowerCase()))
   );
 
-  const salvar = async (e: React.FormEvent<HTMLFormElement>) => {
+  const salvarPaciente = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const body = {
@@ -60,7 +106,6 @@ function Clientes() {
       data_nascimento: String(f.get("data_nascimento") || "") || null,
       cpf: String(f.get("cpf") || "") || null,
       convenio: String(f.get("convenio") || "") || null,
-      ultimo_atendimento: String(f.get("ultimo_atendimento") || "") || null,
       observacoes: String(f.get("observacoes") || "") || null,
     };
     setSaving(true);
@@ -76,6 +121,36 @@ function Clientes() {
       setEdit(null);
     } catch { /* ignora */ } finally {
       setSaving(false);
+    }
+  };
+
+  const lancarAtendimento = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!perfil) return;
+    const f = new FormData(e.currentTarget);
+    const body = {
+      data: String(f.get("data")),
+      hora: String(f.get("hora") || "") || null,
+      tipo: tipoAtend,
+      profissional: String(f.get("profissional") || "") || null,
+      observacoes: String(f.get("observacoes") || "") || null,
+    };
+    setSavingAtend(true);
+    try {
+      const criado = await api.post<Atendimento>(`/pacientes/${perfil.id}/atendimentos`, body);
+      setAtendimentos((prev) => [criado, ...prev]);
+      // Atualiza ultimo_atendimento na lista
+      setList((arr) =>
+        arr.map((p) =>
+          p.id === perfil.id
+            ? { ...p, ultimo_atendimento: body.data }
+            : p
+        )
+      );
+      setPerfil((p) => p ? { ...p, ultimo_atendimento: body.data } : p);
+      setNovoAtend(false);
+    } catch { /* ignora */ } finally {
+      setSavingAtend(false);
     }
   };
 
@@ -128,7 +203,7 @@ function Clientes() {
               {filtered.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell>
-                    <button type="button" onClick={() => setPerfil(c)} className="group text-left">
+                    <button type="button" onClick={() => abrirPerfil(c)} className="group text-left">
                       <p className="cursor-pointer font-medium text-primary underline-offset-2 group-hover:underline">{c.nome}</p>
                       <p className="line-clamp-1 text-xs text-muted-foreground">{c.email ?? "—"}</p>
                     </button>
@@ -136,7 +211,7 @@ function Clientes() {
                   <TableCell>{c.telefone ?? "—"}</TableCell>
                   <TableCell>{c.cpf ?? "—"}</TableCell>
                   <TableCell>{c.convenio ?? "—"}</TableCell>
-                  <TableCell>{c.ultimo_atendimento ?? "—"}</TableCell>
+                  <TableCell>{formatDate(c.ultimo_atendimento)}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => abrirEdit(c)}><Pencil className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => deletar(c.id)}><Trash2 className="h-4 w-4" /></Button>
@@ -148,11 +223,11 @@ function Clientes() {
         )}
       </div>
 
-      {/* Dialog: Criar / Editar */}
+      {/* Dialog: Criar / Editar paciente */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>{edit ? "Editar paciente" : "Novo paciente"}</DialogTitle></DialogHeader>
-          <form onSubmit={salvar} className="space-y-3">
+          <form onSubmit={salvarPaciente} className="space-y-3">
             <div className="space-y-2"><Label>Nome completo</Label><Input name="nome" required defaultValue={edit?.nome} /></div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2"><Label>Telefone</Label><Input name="telefone" placeholder="(11) 99999-0000" defaultValue={edit?.telefone ?? ""} /></div>
@@ -163,7 +238,6 @@ function Clientes() {
               <div className="space-y-2"><Label>Data de nascimento</Label><Input name="data_nascimento" type="date" defaultValue={edit?.data_nascimento ?? ""} /></div>
               <div className="space-y-2"><Label>Convênio</Label><Input name="convenio" placeholder="Unimed, Amil..." defaultValue={edit?.convenio ?? ""} /></div>
             </div>
-            <div className="space-y-2"><Label>Último atendimento</Label><Input name="ultimo_atendimento" type="date" defaultValue={edit?.ultimo_atendimento ?? ""} /></div>
             <div className="space-y-2"><Label>Observações</Label><Textarea name="observacoes" placeholder="Informações adicionais sobre o paciente..." defaultValue={edit?.observacoes ?? ""} /></div>
             <DialogFooter>
               <Button type="submit" disabled={saving}>
@@ -174,9 +248,9 @@ function Clientes() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog: Perfil */}
-      <Dialog open={!!perfil} onOpenChange={(v) => { if (!v) setPerfil(null); }}>
-        <DialogContent className="max-w-md">
+      {/* Dialog: Perfil + Atendimentos */}
+      <Dialog open={!!perfil} onOpenChange={(v) => { if (!v) { setPerfil(null); setNovoAtend(false); } }}>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
@@ -189,29 +263,127 @@ function Clientes() {
             <div className="space-y-4">
               <p className="text-lg font-semibold">{perfil.nome}</p>
               <Separator />
-              <div className="grid gap-3">
+
+              {/* Dados do paciente */}
+              <div className="grid gap-2">
                 {[
                   { Icon: Phone, label: "Telefone", value: perfil.telefone },
                   { Icon: Mail, label: "E-mail", value: perfil.email },
                   { Icon: Hash, label: "CPF", value: perfil.cpf },
-                  { Icon: Calendar, label: "Data de nascimento", value: perfil.data_nascimento },
+                  { Icon: Calendar, label: "Data de nascimento", value: formatDate(perfil.data_nascimento) },
                   { Icon: FileText, label: "Convênio", value: perfil.convenio },
-                  { Icon: Calendar, label: "Último atendimento", value: perfil.ultimo_atendimento },
                   { Icon: FileText, label: "Observações", value: perfil.observacoes },
-                ].map(({ Icon, label, value }) => (
-                  <div key={label} className="flex items-start gap-3 rounded-lg bg-muted/50 px-3 py-2.5">
+                ].map(({ Icon, label, value }) => value ? (
+                  <div key={label} className="flex items-start gap-3 rounded-lg bg-muted/50 px-3 py-2">
                     <Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <div>
                       <p className="text-xs text-muted-foreground">{label}</p>
-                      <p className="text-sm font-medium">{value ?? "—"}</p>
+                      <p className="text-sm font-medium">{value}</p>
                     </div>
                   </div>
-                ))}
+                ) : null)}
               </div>
+
+              <Separator />
+
+              {/* Histórico de atendimentos */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ClipboardList className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-semibold">Atendimentos</span>
+                    {atendimentos.length > 0 && (
+                      <Badge variant="secondary" className="text-xs">{atendimentos.length}</Badge>
+                    )}
+                  </div>
+                  {!novoAtend && (
+                    <Button size="sm" variant="outline" onClick={() => { setNovoAtend(true); setTipoAtend("Consulta"); }}>
+                      <Plus className="mr-1 h-3.5 w-3.5" /> Lançar atendimento
+                    </Button>
+                  )}
+                </div>
+
+                {/* Form: novo atendimento */}
+                {novoAtend && (
+                  <form onSubmit={lancarAtendimento} className="rounded-lg border bg-muted/30 p-3 space-y-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Novo atendimento</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Data</Label>
+                        <Input name="data" type="date" required defaultValue={new Date().toISOString().split("T")[0]} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Hora</Label>
+                        <Input name="hora" type="time" placeholder="HH:MM" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Tipo</Label>
+                        <Select value={tipoAtend} onValueChange={setTipoAtend}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {TIPOS_ATENDIMENTO.map((t) => (
+                              <SelectItem key={t} value={t}>{t}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Profissional</Label>
+                        <Input name="profissional" placeholder="Nome do profissional" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Observações</Label>
+                      <Textarea name="observacoes" placeholder="Notas do atendimento..." className="min-h-[60px]" />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setNovoAtend(false)}>Cancelar</Button>
+                      <Button type="submit" size="sm" disabled={savingAtend}>
+                        {savingAtend ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Salvar"}
+                      </Button>
+                    </div>
+                  </form>
+                )}
+
+                {/* Lista de atendimentos */}
+                {loadingAtend ? (
+                  <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
+                ) : atendimentos.length === 0 && !novoAtend ? (
+                  <p className="py-4 text-center text-sm text-muted-foreground">Nenhum atendimento registrado.</p>
+                ) : (
+                  <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                    {atendimentos.map((a) => (
+                      <div key={a.id} className="flex items-start gap-3 rounded-lg border bg-card px-3 py-2.5">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                          <ChevronRight className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Badge variant="outline" className="text-xs">{a.tipo}</Badge>
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />{formatDate(a.data)}
+                              {a.hora && <><Clock className="h-3 w-3 ml-1" />{a.hora}</>}
+                            </span>
+                          </div>
+                          {a.profissional && (
+                            <p className="text-xs text-muted-foreground mt-0.5">{a.profissional}</p>
+                          )}
+                          {a.observacoes && (
+                            <p className="text-sm mt-1 line-clamp-2">{a.observacoes}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <DialogFooter className="gap-2">
                 <Button variant="outline" onClick={() => setPerfil(null)}>Fechar</Button>
                 <Button onClick={() => { abrirEdit(perfil); setPerfil(null); }}>
-                  <Pencil className="mr-1.5 h-3.5 w-3.5" /> Editar
+                  <Pencil className="mr-1.5 h-3.5 w-3.5" /> Editar dados
                 </Button>
               </DialogFooter>
             </div>

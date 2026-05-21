@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.api import auth, conversations, webhooks, sse, assistant
 from app.api import pacientes, consultas, etiquetas, clinica_users, clinica_settings
+from app.api import atendimentos
 
 settings = get_settings()
 
@@ -43,6 +44,7 @@ app.include_router(webhooks.router, prefix="/api")
 app.include_router(conversations.router, prefix="/api")
 app.include_router(sse.router, prefix="/api")
 app.include_router(pacientes.router, prefix="/api")
+app.include_router(atendimentos.router, prefix="/api")
 app.include_router(consultas.router, prefix="/api")
 app.include_router(etiquetas.router, prefix="/api")
 app.include_router(clinica_users.router, prefix="/api")
