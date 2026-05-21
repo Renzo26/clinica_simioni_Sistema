@@ -47,7 +47,7 @@ function LoginPage() {
         className="hidden text-sidebar-foreground lg:flex lg:flex-col lg:justify-center lg:gap-10 lg:p-16"
         style={{
           background:
-            "linear-gradient(170deg, hsl(43 33% 91%) 0%, hsl(43 33% 85%) 30%, hsl(185 65% 12%) 65%, hsl(185 65% 8%) 100%)",
+            "linear-gradient(170deg, hsl(185 65% 8%) 0%, hsl(185 65% 12%) 30%, hsl(43 33% 85%) 65%, hsl(43 33% 91%) 100%)",
         }}
       >
         <img src="/logo.png" alt="Clínica Simioni" className="w-full max-w-full self-center" />
