@@ -50,7 +50,7 @@ function LoginPage() {
             "linear-gradient(170deg, hsl(43 33% 91%) 0%, hsl(43 33% 85%) 30%, hsl(185 65% 12%) 65%, hsl(185 65% 8%) 100%)",
         }}
       >
-        <img src="/LogoSemescrita.png" alt="Clínica Simioni" className="w-full max-w-full self-center" />
+        <img src="/LogoSemescritaV2.png" alt="Clínica Simioni" className="w-full max-w-full self-center" />
         <div className="w-full">
           <h2 className="font-display text-4xl font-bold leading-tight drop-shadow-sm">
             Cuidando de pacientes com tecnologia e dedicação desde 1983.
