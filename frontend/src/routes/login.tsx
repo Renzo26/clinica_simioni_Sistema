@@ -49,7 +49,9 @@ function LoginPage() {
           background: "hsl(185 65% 10%)",
         }}
       >
-        <img src="/logo.png" alt="Clínica Simioni" className="w-full max-w-full self-center" />
+        <div className="self-center rounded-2xl bg-white p-8 shadow-xl">
+          <img src="/logo.png" alt="Clínica Simioni" className="w-full max-w-full" />
+        </div>
         <div className="w-full">
           <h2 className="font-display text-4xl font-bold leading-tight drop-shadow-sm">
             Cuidando de pacientes com tecnologia e dedicação desde 1983.
