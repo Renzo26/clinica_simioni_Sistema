@@ -50,7 +50,7 @@ function LoginPage() {
         }}
       >
         <div className="self-center rounded-2xl bg-white p-6 shadow-xl">
-          <img src="/logo.png" alt="Clínica Simioni" className="w-full max-w-sm" />
+          <img src="/LogoSemescrita.png" alt="Clínica Simioni" className="w-full max-w-sm" />
         </div>
         <div className="w-full">
           <h2 className="font-display text-4xl font-bold leading-tight drop-shadow-sm">
