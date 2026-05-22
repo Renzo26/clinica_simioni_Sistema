@@ -46,12 +46,11 @@ function LoginPage() {
       <div
         className="hidden text-sidebar-foreground lg:flex lg:flex-col lg:justify-center lg:gap-10 lg:p-16"
         style={{
-          background: "hsl(185 65% 10%)",
+          background:
+            "linear-gradient(170deg, hsl(43 33% 91%) 0%, hsl(43 33% 85%) 30%, hsl(185 65% 12%) 65%, hsl(185 65% 8%) 100%)",
         }}
       >
-        <div className="self-center rounded-2xl bg-white p-6 shadow-xl">
-          <img src="/LogoSemescrita.png" alt="Clínica Simioni" className="w-full max-w-sm mix-blend-multiply" />
-        </div>
+        <img src="/LogoSemescrita.png" alt="Clínica Simioni" className="w-full max-w-full self-center" />
         <div className="w-full">
           <h2 className="font-display text-4xl font-bold leading-tight drop-shadow-sm">
             Cuidando de pacientes com tecnologia e dedicação desde 1983.
