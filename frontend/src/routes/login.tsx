@@ -53,14 +53,14 @@ function LoginPage() {
       style={{ background: BG, color: CREAM }}
     >
       {/* Logo no canto superior esquerdo */}
-      <div className="absolute left-8 top-8 lg:left-12 lg:top-10">
-        <div className="rounded-2xl bg-white p-4 shadow-xl">
-          <img src="/logo.png" alt="Clínica Simioni" className="h-20 w-auto lg:h-24" />
+      <div className="absolute left-6 top-6 lg:left-10 lg:top-10">
+        <div className="rounded-2xl bg-white p-3 shadow-xl">
+          <img src="/logo.png" alt="Clínica Simioni" className="h-14 w-auto lg:h-16" />
         </div>
       </div>
 
       {/* Conteúdo principal — grid 2 colunas em desktop */}
-      <div className="flex min-h-screen flex-col items-start justify-center gap-12 px-8 py-32 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:px-12 lg:py-24">
+      <div className="mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center gap-12 px-6 py-32 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:px-16 lg:py-24">
         {/* Coluna esquerda — título */}
         <div className="w-full max-w-2xl">
           <h1 className="font-display text-5xl font-bold leading-[1.05] tracking-tight lg:text-7xl">
