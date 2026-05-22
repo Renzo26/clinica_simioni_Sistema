@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   MessagesSquare,
   CalendarDays,
-  Stethoscope,
   Users,
   BookOpen,
   Tag,
@@ -55,8 +54,8 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-1.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-            <Stethoscope className="h-5 w-5" />
+          <div className="flex h-12 w-12 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 items-center justify-center rounded-full bg-white border border-sidebar-border shadow-sm overflow-hidden flex-shrink-0 transition-all">
+            <img src="/logo-icon.png" alt="Clínica Simioni" className="h-10 w-10 group-data-[collapsible=icon]:h-6 group-data-[collapsible=icon]:w-6 object-contain transition-all" />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
             <span className="font-display text-base font-bold leading-tight">Clínica Simioni</span>

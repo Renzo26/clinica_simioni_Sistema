@@ -33,3 +33,6 @@ class Paciente(Base):
     clinica: Mapped["Clinica"] = relationship(  # noqa: F821
         "Clinica", back_populates="pacientes"
     )
+    atendimentos: Mapped[list["Atendimento"]] = relationship(  # noqa: F821
+        "Atendimento", back_populates="paciente", cascade="all, delete-orphan", order_by="Atendimento.data.desc()"
+    )
